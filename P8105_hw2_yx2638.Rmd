@@ -1,0 +1,37 @@
+---
+title: "P8105_hw2_yx2638"
+author: "Yifei Xu"
+date: "2022-09-28"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+# Problem 1
+
+```{r}
+# Read and clean the data
+transit_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+        janitor::clean_names() %>%
+        select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, 
+               entrance_type,  ada) %>%
+        mutate(entry = recode(entry, "YES" = "TRUE", "NO" = "FALSE"),
+               entry = as.logical(entry))
+
+
+
+```
+
+```{r}
+# Count the number of distinct stations
+
+
+```
+
