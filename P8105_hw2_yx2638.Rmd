@@ -26,12 +26,35 @@ transit_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
                entry = as.logical(entry))
 
 
+# names of important variables
+variable_name = names(transit_df)
 
+# size of the dataset 
+row = nrow(transit_df)
+col = ncol(transit_df)
 ```
 
 ```{r}
 # Count the number of distinct stations
+station_num = nrow(distinct(transit_df, line, station_name))
 
+# Count the number of stations that are ADA compliant
+ada_station_num = transit_df %>%
+        filter(ada == "TRUE") %>%
+        distinct(line, station_name) %>%
+        nrow()
 
+# Calculte the proportion of station entrances / exits without vending allow entrance?????
+no_vending_extrance_num = transit_df %>%
+        filter(entry == "TRUE", vending == "NO") %>%
+        distinct(line, station_name) %>%
+        nrow()
+
+entrance_num = transit_df %>%
+        filter(entry == "TRUE") %>%
+        distinct(line, station_name) %>%
+        nrow()
+
+no_vending_extrance_prop = scales::percent(no_vending_extrance_num / entrance_num, 0.01)
 ```
 
