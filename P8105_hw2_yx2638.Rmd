@@ -145,8 +145,67 @@ mr_total_balls = mr_prof_trash %>%
         sum()
 ```
 
+# Problem 3
 
+```{r}
+# Read and clean the data in pols-month.csv
+pols = read_csv("data/pols-month.csv")
 
+pols_tidy = pols_mon %>%
+        janitor::clean_names() %>%
+        separate(mon, into = c("year", "month", "day")) %>%
+        mutate(
+                month = month.name[as.numeric(month)],
+                year = as.numeric(year),
+                president = case_when(prez_dem == 1 ~ "dem",
+                               prez_gop == 1 ~ "gop",
+                               prez_gop == 2 ~ "gop") 
+                )%>%
+    select(-day, -prez_dem, -prez_gop)
+```
+
+```{r}
+# Read and clean the data in snp.csv
+snp = read_csv("data/snp.csv")
+
+snp_tidy = snp %>%
+        janitor::clean_names() %>%
+        separate(date, into = c("month", "day", "year"), sep ="/") %>%
+        mutate(
+                month = month.name[as.numeric(month)],
+                year = as.numeric(year),
+                year = ifelse(year < 23, year+2000, year+1900)
+                ) %>%
+        arrange(year, month) %>%
+        select(year, month, close)
+```
+
+```{r}
+# Read and clean the data in unemployment.csv
+unemployment = read_csv("data/unemployment.csv")
+
+unemployment_tidy = unemployment %>%
+        pivot_longer(
+                Jan:Dec,
+                names_to = "month",
+                values_to = "unemployment_percent"
+        ) %>%
+        janitor::clean_names() %>% 
+        mutate(
+                month = match(month, month.abb),
+                month = month.name[month]
+                ) %>%
+        arrange(year, month) 
+
+```
+
+```{r}
+# Join Join the datasets by merging snp into pols
+pols_snp = left_join(pols_tidy, snp_tidy, by = c("year","month"))
+
+# Join the datasets by merging unemployment into the result
+pols_snp_employment = left_join(pols_snp, unemployment_tidy, by = c("year","month"))
+```
 
 
 
