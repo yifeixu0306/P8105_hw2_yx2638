@@ -96,7 +96,7 @@ mr_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx"
 
 mr_trash_tidy = mr_trash %>%
         janitor::clean_names() %>%
-        drop_na(dumpster) %>% #??grand total
+        drop_na() %>% #??grand total
         mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 ```
 
@@ -107,10 +107,44 @@ prof_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xls
 
 prof_trash_tidy = mr_trash %>%
         janitor::clean_names() %>%
-        drop_na(dumpster) %>% #??grand total
+        drop_na() %>% #??grand total
         mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 
 ```
+
+```{r}
+# Add a new variable in these two datasets
+mr_trash_tidy_comb = mr_trash_tidy %>%
+        mutate(name = "Mr. Trash Wheel")
+
+prof_trash_tidy_comb = prof_trash_tidy %>%
+        mutate(name = "Professor Trash Wheel")
+
+# Combine these two datasets
+mr_prof_trash = bind_rows(mr_trash_tidy_comb, prof_trash_tidy_comb) %>%
+        select(name, everything())
+
+```
+
+```{r}
+# Count the number of observations in the resulting dataset
+mr_prof_nrow = nrow(mr_prof_trash)
+
+# Give examples of key variables
+mr_prof_var = names(mr_prof_trash)
+
+# Calculate the total weight of trash collected by Professor Trash Wheel
+prof_total_weight = mr_prof_trash %>%
+        filter(name == "Professor Trash Wheel") %>%
+        sum()
+
+# Count the total number of sports balls collected by Mr. Trash Wheel in 2020
+mr_total_balls = mr_prof_trash %>%
+        filter(name == "Mr. Trash Wheel", year == "2020") %>%
+        pull(sports_balls) %>%
+        sum()
+```
+
 
 
 
