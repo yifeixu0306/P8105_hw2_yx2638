@@ -207,6 +207,21 @@ pols_snp = left_join(pols_tidy, snp_tidy, by = c("year","month"))
 pols_snp_employment = left_join(pols_snp, unemployment_tidy, by = c("year","month"))
 ```
 
+```{r}
+# the dimension of the resulting dataset 
+res_nrow = nrow(pols_snp_employment)
+res_ncol = ncol(pols_snp_employment)
+
+# range of years
+res_year = pols_snp_employment %>%
+        pull(year) %>% 
+        range()
+
+# names of key variables
+res_var = names(pols_snp_employment)
+```
+
+
 
 
 
