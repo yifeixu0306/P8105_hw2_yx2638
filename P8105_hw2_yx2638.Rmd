@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r,  message=FALSE}
 library(tidyverse)
 ```
 
@@ -84,6 +84,40 @@ station_a_ada_num = transit_df_tidy %>%
         filter(route_name == "A", ada == "TRUE") %>%
         distinct(line, station_name) %>%
         nrow()
-        
 ```
+
+
+# Problem 2
+
+```{r}
+# Read and clean the Mr. Trash Wheel sheet
+mr_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
+                                 sheet = "Mr. Trash Wheel", range = "A2:N535") #???homes_power
+
+mr_trash_tidy = mr_trash %>%
+        janitor::clean_names() %>%
+        drop_na(dumpster) %>% #??grand total
+        mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
+```
+
+```{r}
+# Read and clean the Professor Trash Wheel sheet
+prof_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
+                                 sheet = "Professor Trash Wheel", range = "A2:N117") #???homes_power
+
+prof_trash_tidy = mr_trash %>%
+        janitor::clean_names() %>%
+        drop_na(dumpster) %>% #??grand total
+        mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
+
+```
+
+
+
+
+
+
+
+
+
 
