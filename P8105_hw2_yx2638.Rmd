@@ -58,3 +58,32 @@ entrance_num = transit_df %>%
 no_vending_extrance_prop = scales::percent(no_vending_extrance_num / entrance_num, 0.01)
 ```
 
+```{r}
+# Reformat data so that route number and route name are distinct variables
+transit_df_tidy = transit_df %>%
+        mutate(
+                route8 = as.character(route8),
+                route9 = as.character(route9),
+                route10 = as.character(route10),
+                route11 = as.character(route11)
+               ) %>%
+        pivot_longer(
+                route1:route11,
+                names_to = "route_number",
+                values_to = "route_name"
+                )
+
+# Count the number of distinct stations serve the A train
+station_a_num = transit_df_tidy %>%
+        filter(route_name == "A") %>%
+        distinct(line, station_name) %>%
+        nrow()
+
+# Count the number of ADA compliant of the stations that serve the A train
+station_a_ada_num = transit_df_tidy %>%
+        filter(route_name == "A", ada == "TRUE") %>%
+        distinct(line, station_name) %>%
+        nrow()
+        
+```
+
