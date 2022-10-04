@@ -9,14 +9,14 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r,  message=FALSE}
+```{r, message=FALSE}
 library(tidyverse)
 ```
 
 
 # Problem 1
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the data
 transit_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
         janitor::clean_names() %>%
@@ -34,7 +34,7 @@ row = nrow(transit_df)
 col = ncol(transit_df)
 ```
 
-```{r}
+```{r, message=FALSE}
 # Count the number of distinct stations
 station_num = nrow(distinct(transit_df, line, station_name))
 
@@ -44,21 +44,23 @@ ada_station_num = transit_df %>%
         distinct(line, station_name) %>%
         nrow()
 
-# Calculte the proportion of station entrances / exits without vending allow entrance?????
+# Calculte the proportion of station entrances / exits without vending allow entrance ???distinct
 no_vending_extrance_num = transit_df %>%
         filter(entry == "TRUE", vending == "NO") %>%
-        distinct(line, station_name) %>%
         nrow()
 
-entrance_num = transit_df %>%
-        filter(entry == "TRUE") %>%
-        distinct(line, station_name) %>%
+no_vending_num = transit_df %>%
+        filter(vending == "NO") %>%
         nrow()
 
-no_vending_extrance_prop = scales::percent(no_vending_extrance_num / entrance_num, 0.01)
+prop = scales::percent(no_vending_extrance_num / no_vending_num, 0.01)
 ```
 
-```{r}
+There are `r station_num` distinct stations and `r ada_station_num` stations are ADA compliant.
+The proportion of station entrances / exits without vending allow entrance is `r prop`.
+
+
+```{r, message=FALSE}
 # Reformat data so that route number and route name are distinct variables
 transit_df_tidy = transit_df %>%
         mutate(
@@ -86,47 +88,51 @@ station_a_ada_num = transit_df_tidy %>%
         nrow()
 ```
 
+`r station_a_num` distinct stations serve the A train, of which `r station_a_ada_num` are ADA compliant.
+
 
 # Problem 2
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the Mr. Trash Wheel sheet
 mr_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
-                                 sheet = "Mr. Trash Wheel", range = "A2:N535") #???homes_power
+                                 sheet = "Mr. Trash Wheel", range = "A2:N535") 
 
 mr_trash_tidy = mr_trash %>%
         janitor::clean_names() %>%
-        drop_na() %>% #??grand total
+        drop_na(dumpster) %>% 
+        filter(dumpster != "Grand Total") %>%
         mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 ```
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the Professor Trash Wheel sheet
 prof_trash = readxl::read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
-                                 sheet = "Professor Trash Wheel", range = "A2:N117") #???homes_power
+                                 sheet = "Professor Trash Wheel", range = "A2:N117") 
 
-prof_trash_tidy = mr_trash %>%
+prof_trash_tidy = prof_trash %>%
         janitor::clean_names() %>%
-        drop_na() %>% #??grand total
+        drop_na(dumpster) %>% 
+        filter(dumpster != "Grand Total") %>%
         mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 
 ```
 
-```{r}
+```{r, message=FALSE}
 # Add a new variable in these two datasets
 mr_trash_tidy_comb = mr_trash_tidy %>%
-        mutate(name = "Mr. Trash Wheel")
+        mutate(wheel_name = "Mr. Trash Wheel")
 
 prof_trash_tidy_comb = prof_trash_tidy %>%
-        mutate(name = "Professor Trash Wheel")
+        mutate(wheel_name = "Professor Trash Wheel")
 
 # Combine these two datasets
-mr_prof_trash = bind_rows(mr_trash_tidy_comb, prof_trash_tidy_comb) %>%
-        select(name, everything())
+mr_prof_trash = rbind(mr_trash_tidy_comb, prof_trash_tidy_comb) %>%
+        select(wheel_name, everything())
 
 ```
 
-```{r}
+```{r, message=FALSE}
 # Count the number of observations in the resulting dataset
 mr_prof_nrow = nrow(mr_prof_trash)
 
@@ -135,23 +141,37 @@ mr_prof_var = names(mr_prof_trash)
 
 # Calculate the total weight of trash collected by Professor Trash Wheel
 prof_total_weight = mr_prof_trash %>%
-        filter(name == "Professor Trash Wheel") %>%
+        filter(wheel_name == "Professor Trash Wheel") %>%
+        pull(weight_tons) %>%
         sum()
 
 # Count the total number of sports balls collected by Mr. Trash Wheel in 2020
 mr_total_balls = mr_prof_trash %>%
-        filter(name == "Mr. Trash Wheel", year == "2020") %>%
+        filter(wheel_name == "Mr. Trash Wheel", year == "2020") %>%
         pull(sports_balls) %>%
         sum()
 ```
+* `Mr. Trash Wheel` dataset  
+The size of the tidy dataset is `r nrow(mr_trash_tidy)` rows * `r ncol(mr_trash_tidy)` columns.  
+The key variables include `r names(mr_trash_tidy)`.  
+
+* `Professor Trash Wheel` dataset  
+The size of the tidy dataset is `r nrow(prof_trash_tidy)` rows * `r ncol(prof_trash_tidy)` columns.  
+The key variables include `r names(prof_trash_tidy)`.  
+
+* Resulting(combining) dataset  
+There are `r mr_prof_nrow` observations in the resulting dataset and the key variables include `r mr_prof_var`.  
+The total weight of trash collected by Professor Trash Wheel was `r prof_total_weight` tons.  
+The total number of sports balls collected by Mr. Trash Wheel in 2020 was `r mr_total_balls`.
+
 
 # Problem 3
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the data in pols-month.csv
 pols = read_csv("data/pols-month.csv")
 
-pols_tidy = pols_mon %>%
+pols_tidy = pols %>%
         janitor::clean_names() %>%
         separate(mon, into = c("year", "month", "day")) %>%
         mutate(
@@ -164,7 +184,7 @@ pols_tidy = pols_mon %>%
     select(-day, -prez_dem, -prez_gop)
 ```
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the data in snp.csv
 snp = read_csv("data/snp.csv")
 
@@ -180,7 +200,7 @@ snp_tidy = snp %>%
         select(year, month, close)
 ```
 
-```{r}
+```{r, message=FALSE}
 # Read and clean the data in unemployment.csv
 unemployment = read_csv("data/unemployment.csv")
 
@@ -199,15 +219,15 @@ unemployment_tidy = unemployment %>%
 
 ```
 
-```{r}
-# Join Join the datasets by merging snp into pols
+```{r, message=FALSE}
+# Join the datasets by merging snp into pols
 pols_snp = left_join(pols_tidy, snp_tidy, by = c("year","month"))
 
 # Join the datasets by merging unemployment into the result
 pols_snp_employment = left_join(pols_snp, unemployment_tidy, by = c("year","month"))
 ```
 
-```{r}
+```{r, message=FALSE}
 # the dimension of the resulting dataset 
 res_nrow = nrow(pols_snp_employment)
 res_ncol = ncol(pols_snp_employment)
@@ -217,10 +237,28 @@ res_year = pols_snp_employment %>%
         pull(year) %>% 
         range()
 
+res_year_min = pols_snp_employment %>%
+        pull(year) %>% 
+        min()
+
+res_year_max = pols_snp_employment %>%
+        pull(year) %>% 
+        max()
+
 # names of key variables
 res_var = names(pols_snp_employment)
 ```
+* `pols-month` dataset  
+The tidy `pols-month` dataset contains `r nrow(pols_tidy)` observations and `r ncol(pols_tidy)` variables related to the number of national politicians who are democratic or republican from `r pols_tidy %>% pull(year) %>% min` to `r pols_tidy %>% pull(year) %>% max`. Key variables include `r names(pols_tidy)`
 
+* `snp` dataset  
+The tidy `snp` dataset contains `r nrow(snp_tidy)` observations and `r ncol(snp_tidy)` variables related to Standard & Poor’s stock market index (S&P) with a year range from `r snp_tidy %>% pull(year) %>% min` to `r snp_tidy %>% pull(year) %>% max`. Key variables include `r names(snp_tidy)`
+
+* `unemployment` dataset  
+The tidy `unemployment` dataset contains `r nrow(unemployment_tidy)` observations and `r ncol(unemployment_tidy)` variables related to the number of national politicians who are democratic or republican from `r unemployment_tidy %>% pull(year) %>% min` to `r unemployment_tidy %>% pull(year) %>% max`. Key variables include `r names(unemployment_tidy)`
+
+* Merged dataset `pols_snp_unemploymet`  
+The merged dataset `pols_snp` contains `r res_nrow` observations and `r res_ncol` variables, with a range of years from `r res_year_min` to `r res_year_max`. Key variables includes `r res_var`, which represents year and month of the observation, the number of republican governors, the number of republican senators, the number of republican representatives, the number of democratic governors, the number of democratic senators, the number of democratic representatives on the associated date, the president's political party, the closing values of the S&P stock index and percentage of unemployment on the associated date.By joining these three datasets, we can further analze how president's political party affect economic outcomes such as stocks and unemployment.
 
 
 
