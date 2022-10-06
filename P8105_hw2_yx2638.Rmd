@@ -34,6 +34,8 @@ row = nrow(transit_df)
 col = ncol(transit_df)
 ```
 
+The size of the dataset is `r row` rows * `r col` columns. The key variables include `r variable_name`.
+
 ```{r, message=FALSE}
 # Count the number of distinct stations
 station_num = nrow(distinct(transit_df, line, station_name))
@@ -163,7 +165,7 @@ The size of the tidy dataset is `r nrow(prof_trash_tidy)` rows * `r ncol(prof_tr
 The key variables include `r names(prof_trash_tidy)`.  
 
 * Resulting(combining) dataset  
-There are `r mr_prof_nrow` observations in the resulting dataset and the key variables include `r mr_prof_var`.  
+There are `r mr_prof_nrow` observations in the resulting dataset and the `r ncol(mr_prof_trash)` key variables include `r mr_prof_var`.  
 The total weight of trash collected by Professor Trash Wheel was `r prof_total_weight` tons.  
 The total number of sports balls collected by Mr. Trash Wheel in 2020 was `r mr_total_balls`.
 
@@ -253,13 +255,13 @@ res_year_max = pols_snp_employment %>%
 res_var = names(pols_snp_employment)
 ```
 * `pols-month` dataset  
-The tidy `pols-month` dataset contains `r nrow(pols_tidy)` observations and `r ncol(pols_tidy)` variables related to the number of national politicians who are democratic or republican from `r pols_tidy %>% pull(year) %>% min` to `r pols_tidy %>% pull(year) %>% max`. Key variables include `r names(pols_tidy)`
+The tidy `pols-month` dataset contains `r nrow(pols_tidy)` observations and `r ncol(pols_tidy)` variables related to the number of national politicians who are democratic or republican from `r pols_tidy %>% pull(year) %>% min` to `r pols_tidy %>% pull(year) %>% max`. Key variables include `r names(pols_tidy)`.
 
 * `snp` dataset  
-The tidy `snp` dataset contains `r nrow(snp_tidy)` observations and `r ncol(snp_tidy)` variables related to Standard & Poor’s stock market index (S&P) with a year range from `r snp_tidy %>% pull(year) %>% min` to `r snp_tidy %>% pull(year) %>% max`. Key variables include `r names(snp_tidy)`
+The tidy `snp` dataset contains `r nrow(snp_tidy)` observations and `r ncol(snp_tidy)` variables related to Standard & Poor’s stock market index (S&P) with a year range from `r snp_tidy %>% pull(year) %>% min` to `r snp_tidy %>% pull(year) %>% max`. Key variables include `r names(snp_tidy)`.
 
 * `unemployment` dataset  
-The tidy `unemployment` dataset contains `r nrow(unemployment_tidy)` observations and `r ncol(unemployment_tidy)` variables related to the number of national politicians who are democratic or republican from `r unemployment_tidy %>% pull(year) %>% min` to `r unemployment_tidy %>% pull(year) %>% max`. Key variables include `r names(unemployment_tidy)`
+The tidy `unemployment` dataset contains `r nrow(unemployment_tidy)` observations and `r ncol(unemployment_tidy)` variables related to the number of national politicians who are democratic or republican from `r unemployment_tidy %>% pull(year) %>% min` to `r unemployment_tidy %>% pull(year) %>% max`. Key variables include `r names(unemployment_tidy)`.
 
 * Merged dataset `pols_snp_unemploymet`  
 The merged dataset `pols_snp` contains `r res_nrow` observations and `r res_ncol` variables, with a range of years from `r res_year_min` to `r res_year_max`. Key variables includes `r res_var`, which represents year and month of the observation, the number of republican governors, the number of republican senators, the number of republican representatives, the number of democratic governors, the number of democratic senators, the number of democratic representatives on the associated date, the president's political party, the closing values of the S&P stock index and percentage of unemployment on the associated date.By joining these three datasets, we can further analze how president's political party affect economic outcomes such as stocks and unemployment.
